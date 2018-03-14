@@ -150,20 +150,35 @@ def write_annual_csv_files(df, start_year, end_year, path, basename):
 
 def import_studenthuset_data_to_dataframe(path, dict_name):
 
+    # Read and load the json file with info about each file
     with open(fpath(path, dict_name)) as f:
         file_info_dict = json.loads(f.read())
 
+    # Temporary list to store dataframe while we read in information
     dfs = []
 
+    # Walk files in json file
     for f_name in file_info_dict:
+        print('Importing File: {}'.format(f_name))
+
+        # Shortcut
         worksheets = file_info_dict[f_name]
+
+        # Walk worksheets in this file
         for sheet_name in worksheets:
+
+            print('\tSheet: {}'.format(sheet_name))
+
+            # Shortcut
             this_sheet = file_info_dict[f_name][sheet_name]
+
+            # pd.read_excel arguments
             header = this_sheet['header']
-            index_name = this_sheet['index_name']
             index_col = this_sheet['index_col']
             usecols = this_sheet['usecols']
             other_names = this_sheet['other_names']
+
+            # Read the excel file
             df = pd.read_excel(fpath(path, f_name),
                                sheet_name=sheet_name,
                                header=header,
@@ -171,11 +186,12 @@ def import_studenthuset_data_to_dataframe(path, dict_name):
                                parse_dates=[index_col],
                                names=other_names,
                                usecols=usecols)
-            df.index.name = index_name
             df.sort_index(inplace=True)
 
+            # Store the temporary dataframes so they can be merged later
             dfs.append(df)
 
+    # Merge all of the dataframe for each sheet from each file
     df_final = pd.concat(dfs)
 
     # Sort the final dataframe dates
@@ -186,6 +202,9 @@ def import_studenthuset_data_to_dataframe(path, dict_name):
 
     # Drops any duplicates by date/time. Keeps the first, deletes the rest
     df_final.drop_duplicates()
+
+    # Resample the data on an hourly interval
+    df_final = df_final.resample('60T').mean()
 
     return df_final
 
