@@ -1,0 +1,122 @@
+{
+  "Ambient_Temp_20160101-20160907.xlsx": {
+    "Sheet1": {
+      "header": 3,
+      "index_col": 0,
+      "usecols": [ 0, 1 ],
+      "other_names": [ "Ambient Temp (C)" ]
+    }
+  },
+  "Cm_Cooling_001_Volume_meter_value_2016_1473084170.xlsx": {
+    "1473084170": {
+      "header": 3,
+      "index_col": 0,
+      "usecols": [ 0, 2 ],
+      "other_names": [ "Cooling 001 Volume Meter Value (m3)" ]
+    }
+  },
+  "CP_Cooling_101_Capacity_2016_1473085846.xlsx": {
+    "1473085846": {
+      "header": 3,
+      "index_col": 0,
+      "usecols": [ 0, 2 ],
+      "other_names": [ "Cooling 001 Capacity (kW)" ]
+    }
+  },
+  "CQ_Cooling_001_2016_1473082720.xlsx": {
+    "1473082720": {
+      "header": 3,
+      "index_col": 0,
+      "usecols": [ 0, 2 ],
+      "other_names": [ "Cooling (MWh)" ]
+    }
+  },
+  "CTB_Cooling_001_Temp_out_2016_1473083283.xlsx": {
+    "1473083283": {
+      "header": 3,
+      "index_col": 0,
+      "usecols": [ 0, 2 ],
+      "other_names": [ "Cooling 001 Temp Out (C)" ]
+    }
+  },
+  "CTR_Cooling_001_temp_return_2016_1473083699.xlsx": {
+    "1473083699": {
+      "header": 3,
+      "index_col": 0,
+      "usecols": [ 0, 2 ],
+      "other_names": [ "Cooling 001 Temp Return (C)" ]
+    }
+  },
+  "DHW_volume_meter_value_2016_1473082210.xlsx": {
+    "1473082210": {
+      "header": 3,
+      "index_col": 0,
+      "usecols": [ 0, 2 ],
+      "other_names": [ "Hot Water Volume Meter Value (m3)" ]
+    }
+  },
+  "EQ_EL007_2016.xlsx": {
+    "Sheet1": {
+      "header": 3,
+      "index_col": 0,
+      "usecols": [ 0, 1 ],
+      "other_names": [ "EQ EL007 Energy (kWh)" ]
+    }
+  },
+  "Hm_Fluid_volume_meter_htg_2016_1473081579.xlsx": {
+    "1473081579": {
+      "header": 3,
+      "index_col": 0,
+      "usecols": [ 0, 2 ],
+      "other_names": [ "Fluid Volume Meter - Heating (m3)" ]
+    }
+  },
+  "HP_heating_Capacity_2016_1473080034.xlsx": {
+    "1473080034": {
+      "header": 3,
+      "index_col": 0,
+      "usecols": [ 0, 2 ],
+      "other_names": [ "Heating Capacity (kW)" ]
+    }
+  },
+  "HQ_Heating_2016_1473079241.xlsx": {
+    "1473079241": {
+      "header": 3,
+      "index_col": 0,
+      "usecols": [ 0, 2 ],
+      "other_names": [ "Heat from HPs to Bldg (MWh)" ]
+    }
+  },
+  "HTB_Temp_htg_to_bldg_2016_1473080485.xlsx": {
+    "1473080485": {
+      "header": 3,
+      "index_col": 0,
+      "usecols": [ 0, 2 ],
+      "other_names": [ "Heating Temp to Bldg (C)" ]
+    }
+  },
+  "HTR_Temp_htg_return_2016_1473081099.xlsx": {
+    "1473081099": {
+      "header": 3,
+      "index_col": 0,
+      "usecols": [ 0, 2 ],
+      "other_names": [ "Heating Temp Return from Bldg (C)" ]
+    }
+  },
+  "Not_for_use_El_004_HPs_and_Circpumps_2016.xlsx": {
+    "1473084742": {
+      "header": 3,
+      "index_col": 0,
+      "usecols": [ 0, 2 ],
+      "other_names": [ "Electricity 004 HPs and Circ Pumps (kWh)" ]
+    }
+  },
+  "Unknown_Cooling_002_energy_2016_1473085401.xlsx": {
+    "1473085401": {
+      "header": 3,
+      "index_col": 0,
+      "usecols": [ 0, 2 ],
+      "other_names": [ "Cooling 002 Energy (MWh)" ]
+    }
+  }
+}

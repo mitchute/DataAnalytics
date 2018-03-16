@@ -10,8 +10,6 @@ import pandas as pd
 fpath = os.path.join
 
 
-
-
 def combine_date_time(date, time):
     # Worker function to combine two date time objects; one containing the date, the other containing the time.
     new_dt = datetime(date.year, date.month, date.day, time.hour, time.minute, time.second)
@@ -148,7 +146,7 @@ def write_annual_csv_files(df, start_year, end_year, path, basename):
         df_annual.to_csv(fpath(path, file_name))
 
 
-def import_studenthuset_data_to_dataframe(path, dict_name):
+def import_excel_files_to_single_dataframe(path, dict_name):
 
     # Read and load the json file with info about each file
     with open(fpath(path, dict_name)) as f:
@@ -209,11 +207,167 @@ def import_studenthuset_data_to_dataframe(path, dict_name):
     return df_final
 
 
+def fill_dataframe_null_vals(df, path, dict_name):
+
+    # Read and load the json file with info about each file
+    with open(fpath(path, dict_name)) as f:
+        fill_info_dict = json.loads(f.read())
+
+    for col_name in fill_info_dict:
+        print('Filling Column: {}'.format(col_name))
+
+        method = fill_info_dict[col_name].lower()
+
+
+        ts = df[col_name]
+
+        # Refer to: https://pandas.pydata.org/pandas-docs/stable/missing_data.html
+
+        if method == 'interp-time':
+            ts = ts.interpolate(method='time')
+        elif method == 'interp':
+            ts = ts.interpolate()
+        elif method == 'ffill':
+            ts = ts.fillna(method='ffill')
+        elif method == 'bfill':
+            ts = ts.fillna(method='bfill')
+        elif method == 'mean-column':
+            ts = ts.fillna(ts.mean())
+        elif method == 'mean':
+            ts = ts.fillna(fill_with_mean_from_surrounding_vals(ts))
+        elif method == 'fsmear':
+            ts = ts.fillna(fill_with_forward_smear(ts))
+        elif method == 'bsmear':
+            ts = ts.fillna(fill_with_backward_smear(ts))
+
+        df[col_name] = ts
+
+    return df
+
+
+def fill_with_mean_from_surrounding_vals(series):
+
+    null_indices = []
+    data_indices = []
+
+    for i, curr_val in enumerate(series):
+        if pd.isnull(curr_val):
+            null_indices.append(i)
+        else:
+            data_indices.append(i)
+
+    for i, data_index in enumerate(data_indices):
+        if i == 0:
+            pass
+        else:
+            u_index = data_index
+            l_index = data_indices[i-1]
+            if (u_index - l_index) > 1:
+                u_val = series[u_index]
+                l_val = series[l_index]
+                fill_val = (u_val + l_val) / 2.0
+                num_null_indices_to_pop = 0
+                for j, null_index in enumerate(null_indices):
+                    if null_index < l_index:
+                        num_null_indices_to_pop += 1
+                        pass
+                    elif u_index < null_index:
+                        for k in range(num_null_indices_to_pop):
+                            null_indices.pop(0)
+                        break
+                    else:
+                        series[null_index] = fill_val
+
+    return series
+
+
+def fill_with_forward_smear(series):
+
+    null_indices = []
+    data_indices = []
+
+    # Get the data and null indices first
+    for i, curr_val in enumerate(series):
+        if pd.isnull(curr_val):
+            null_indices.append(i)
+        else:
+            data_indices.append(i)
+
+    # Forward-fill all but missing values between valid data
+    for i, data_index in enumerate(data_indices):
+        if i == 0:
+            pass
+        else:
+            u_index = data_index
+            l_index = data_indices[i-1]
+            if (u_index - l_index) > 1:
+
+                fill_val = series[l_index] / (u_index - l_index)
+
+                # Fill the original data point with the forward-smear val
+                series[l_index] = fill_val
+
+                num_null_indices_to_pop = 0
+
+                for j, null_index in enumerate(null_indices):
+                    if null_index < l_index:
+                        num_null_indices_to_pop += 1
+                        pass
+                    elif u_index < null_index:
+                        # Remove null indices from list as we go
+                        for k in range(num_null_indices_to_pop):
+                            null_indices.pop(0)
+                        break
+                    else:
+                        series[null_index] = fill_val
+
+    # Fill missing values at end of list
+    num_null_indices_to_pop = 0
+
+    # Figure out how many need to be removed first
+    for i, null_index in enumerate(null_indices):
+        if null_index < data_indices[-1]:
+            num_null_indices_to_pop += 1
+
+    # Remove any that are already done
+    for i in range(num_null_indices_to_pop):
+        null_indices.pop(0)
+
+    # Forward fill data at the end of the list
+    fill_val = series[data_indices[-1]] / (len(null_indices) + 1)
+    series[data_indices[-1]] = fill_val
+
+    for i, null_index in enumerate(null_indices):
+        series[null_index] = fill_val
+
+    return series
+
+
+def fill_with_backward_smear(series):
+
+    null_indices = []
+
+    # Backward fill the null vals
+    for i, curr_val in enumerate(series):
+        if pd.isnull(curr_val):
+            null_indices.append(i)
+        else:
+            if null_indices:
+                fill_val = series[i] / (len(null_indices) + 1)
+
+                for null_index in null_indices:
+                    series[null_index] = fill_val
+
+                series[i] = fill_val
+                null_indices = []
+
+    return series
+
+
 if __name__ == '__main__':
     # df = import_all_spain_data_sets_in_dir_to_dataframe('.')
     # df = load_stored_dataframes_from_csv_to_single_dataframe(sys.argv[1])
     # df = write_annual_csv_files(sys.argv[1])
-
-    df = import_studenthuset_data_to_dataframe(sys.argv[1], sys.argv[2])
-
+    df = import_excel_files_to_single_dataframe(sys.argv[1], sys.argv[2])
+    df = fill_dataframe_null_vals(df, sys.argv[1], sys.argv[3])
     pass

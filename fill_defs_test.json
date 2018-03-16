@@ -1,0 +1,11 @@
+{
+  "interp-time": "interp-time",
+  "interp": "interp",
+  "ffill": "ffill",
+  "bfill": "bfill",
+  "mean": "mean",
+  "mean-column": "mean-column",
+  "fsmear": "fsmear",
+  "bsmear": "bsmear"
+}
+

@@ -1,0 +1,10 @@
+{
+  "Import_and_Fill_Test_Data.xlsx": {
+    "Sheet1": {
+      "header": 0,
+      "index_col": 0,
+      "usecols": [ 0, 1, 2, 3, 4, 5, 6, 7, 8],
+      "other_names": [ "interp-time", "interp", "ffill", "bfill", "mean", "mean-column", "fsmear", "bsmear" ]
+    }
+  }
+}
