@@ -207,7 +207,9 @@ def import_excel_files_to_single_dataframe(path, dict_name):
     return df_final
 
 
-def fill_dataframe_null_vals(df, path, dict_name):
+def fill_dataframe_null_vals(df_input, path, dict_name):
+
+    df = df_input.copy()
 
     # Read and load the json file with info about each file
     with open(fpath(path, dict_name)) as f:
@@ -284,61 +286,33 @@ def fill_with_mean_from_surrounding_vals(series):
 def fill_with_forward_smear(series):
 
     null_indices = []
-    data_indices = []
 
-    # Get the data and null indices first
+    found_data = False
+
+    last_index_in_series = len(series) - 1
+
+    # Forward fill the null vals
     for i, curr_val in enumerate(series):
         if pd.isnull(curr_val):
-            null_indices.append(i)
-        else:
-            data_indices.append(i)
+            if found_data:
+                null_indices.append(i)
+        elif pd.notnull(curr_val):
+            found_data = True
+            if null_indices:
+                fill_val = series[null_indices[0] - 1] / (len(null_indices) + 1)
+                series[null_indices[0] - 1] = fill_val
 
-    # Forward-fill all but missing values between valid data
-    for i, data_index in enumerate(data_indices):
-        if i == 0:
-            pass
-        else:
-            u_index = data_index
-            l_index = data_indices[i-1]
-            if (u_index - l_index) > 1:
+                for null_index in null_indices:
+                    series[null_index] = fill_val
 
-                fill_val = series[l_index] / (u_index - l_index)
+                null_indices = []
 
-                # Fill the original data point with the forward-smear val
-                series[l_index] = fill_val
-
-                num_null_indices_to_pop = 0
-
-                for j, null_index in enumerate(null_indices):
-                    if null_index < l_index:
-                        num_null_indices_to_pop += 1
-                        pass
-                    elif u_index < null_index:
-                        # Remove null indices from list as we go
-                        for k in range(num_null_indices_to_pop):
-                            null_indices.pop(0)
-                        break
-                    else:
-                        series[null_index] = fill_val
-
-    # Fill missing values at end of list
-    num_null_indices_to_pop = 0
-
-    # Figure out how many need to be removed first
-    for i, null_index in enumerate(null_indices):
-        if null_index < data_indices[-1]:
-            num_null_indices_to_pop += 1
-
-    # Remove any that are already done
-    for i in range(num_null_indices_to_pop):
-        null_indices.pop(0)
-
-    # Forward fill data at the end of the list
-    fill_val = series[data_indices[-1]] / (len(null_indices) + 1)
-    series[data_indices[-1]] = fill_val
-
-    for i, null_index in enumerate(null_indices):
-        series[null_index] = fill_val
+    # If nulls run to end of list, fill here
+    if null_indices:
+        fill_val = series[null_indices[0] - 1] / (len(null_indices) + 1)
+        series[null_indices[0] - 1] = fill_val
+        for null_index in null_indices:
+            series[null_index] = fill_val
 
     return series
 
