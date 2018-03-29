@@ -86,7 +86,7 @@ def load_stored_dataframes_from_csv_to_single_dataframe(path):
         dfs = []
         for (dirpath, dirnames, filenames) in os.walk(path):
             for filename in filenames:
-                if fnmatch.fnmatch(filename, '*_Raw.csv'):
+                if fnmatch.fnmatch(filename, '*.csv'):
                     try:
                         # Load the csv files
                         print('Reading {}'.format(filename))
@@ -248,7 +248,31 @@ def fill_dataframe_null_vals(df_input, path, dict_name):
 
 
 def fill_with_mean_from_surrounding_vals(series):
+    """
+    Fills a series using the mean of the surrounding values
 
+    Example:
+        >>> from numpy import nan
+        >>> from pandas import Series
+        >>> s = Series([nan, 2, nan, 1, nan])
+        >>> s
+        0    NaN
+        1    2.0
+        2    NaN
+        3    1.0
+        4    NaN
+        dtype: float64
+        >>> fill_with_mean_from_surrounding_vals(s)
+        0    NaN
+        1    2.0
+        2    1.5
+        3    1.0
+        4    NaN
+        dtype: float64
+
+    :param series: numeric data series to be filled
+    :return: filled series
+    """
     null_indices = []
     data_indices = []
 
@@ -284,7 +308,31 @@ def fill_with_mean_from_surrounding_vals(series):
 
 
 def fill_with_forward_smear(series):
+    """
+    Fills a series using the forwards smear technique
 
+    Example:
+        >>> from numpy import nan
+        >>> from pandas import Series
+        >>> s = Series([nan, nan, nan, 1, nan])
+        >>> s
+        0    NaN
+        1    NaN
+        2    NaN
+        3    1.0
+        4    NaN
+        dtype: float64
+        >>> fill_with_forward_smear(s)
+        0    NaN
+        1    NaN
+        2    NaN
+        3    0.5
+        4    0.5
+        dtype: float64
+
+    :param series: numeric data series to be filled
+    :return: filled series
+    """
     null_indices = []
 
     found_data = False
@@ -318,10 +366,34 @@ def fill_with_forward_smear(series):
 
 
 def fill_with_backward_smear(series):
+    """
+    Fills a series using the backwards smear technique
+
+    Example:
+        >>> from numpy import nan
+        >>> from pandas import Series
+        >>> s = Series([nan, nan, nan, 1, nan])
+        >>> s
+        0    NaN
+        1    NaN
+        2    NaN
+        3    1.0
+        4    NaN
+        dtype: float64
+        >>> fill_with_backward_smear(s)
+        0    0.25
+        1    0.25
+        2    0.25
+        3    0.25
+        4     NaN
+        dtype: float64
+
+    :param series: numeric data series to be filled
+    :return: filled series
+    """
 
     null_indices = []
 
-    # Backward fill the null vals
     for i, curr_val in enumerate(series):
         if pd.isnull(curr_val):
             null_indices.append(i)
