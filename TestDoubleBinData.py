@@ -1,5 +1,7 @@
 import random
+
 import numpy as np
+from matplotlib import pyplot as plt
 from scipy.stats import binned_statistic_2d
 
 
@@ -30,15 +32,34 @@ def test_double_bin(x1, x2, y, binx, biny):
     return binned_statistic_2d(x1, x2, y, bins=[binx, biny], statistic='mean')
 
 
-if __name__ == '__main__':
-    x1, x2, y = make_double_bin_test_data()
+def ew_mean(a, window=2):
+    return np.convolve(a, np.ones((window,)) / window, mode='valid')
 
-    print(x1)
-    print(x2)
-    print(y)
+
+def plot_double_bin(bin_results, x_label, y_label, legend_label):
+
+    print(bin_results)
+
+    plt_data = bin_results.statistic
+    x_edge = ew_mean(bin_results.x_edge)
+    y_edge = ew_mean(bin_results.y_edge)
+
+    for i in range(plt_data.shape[0]):
+        x = y_edge
+        y = plt_data[i]
+        plt.plot(x, y, label=x_edge[i])
+
+    plt.legend(title=legend_label)
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
+    plt.grid()
+    plt.show()
+
+
+
+if __name__ == '__main__':
+
+    x1, x2, y = make_double_bin_test_data()
     binx = [0, 2, 4, 6]
     biny = [6, 8, 10]
-    ret = test_double_bin(x1, x2, y, binx, biny)
-
-    print(ret)
-    print(np.transpose(ret.statistic))
+    plot_double_bin(test_double_bin(x1, x2, y, binx, biny), 'X-Name', 'Y-Name', 'L-Name')
